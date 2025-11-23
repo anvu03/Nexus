@@ -8,7 +8,7 @@ sqlpath=$3
 echo "SELECT * FROM SYS.DATABASES" | dd of=testsqlconnection.sql
 for i in {1..60};
 do
-    /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $SApassword -C -d master -i testsqlconnection.sql > /dev/null
+    sqlcmd -S localhost -U sa -P $SApassword -d master -i testsqlconnection.sql > /dev/null 2>&1
     if [ $? -eq 0 ]
     then
         echo "SQL server ready"
@@ -45,7 +45,7 @@ then
         if [[ "$f" == *.sql ]]
         then
             echo "Executing $f"
-            /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$SApassword" -C -d master -i "$f"
+            sqlcmd -S localhost -U sa -P "$SApassword" -d master -i "$f"
         fi
     done
 fi
