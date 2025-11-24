@@ -5,6 +5,7 @@
 ### **1\. Dependency Injection Setup (Program.cs)**
 
 This configuration enables the "Enterprise" features: L1+L2, Backplane, and Serialization.  
+```csharp
 // Standard FusionCache Setup  
 builder.Services.AddFusionCache()  
     .WithDefaultEntryOptions(options \=\> {  
@@ -22,6 +23,7 @@ builder.Services.AddFusionCache()
     .WithBackplane(  
         new RedisBackplane(new RedisBackplaneOptions { Configuration \= "localhost:6379" })  
     );
+```
 
 ### **2\. The "Chaos Repository" Pattern**
 
@@ -41,6 +43,7 @@ Use for: Product Descriptions, Specs, JSON Blobs.
 
 * **Strategy:** Aggressive Caching \+ Soft Timeouts.  
 * **Code Pattern:**  
+```csharp
   var product \= await \_cache.GetOrSetAsync(  
       $"product:{id}",  
       async (ctx) \=\> {  
@@ -50,6 +53,7 @@ Use for: Product Descriptions, Specs, JSON Blobs.
       },  
       options \=\> options.SetFactorySoftTimeout(TimeSpan.FromMilliseconds(200))  
   );
+```
 
 #### **Pattern B: "The Volatile Read" (Stock)**
 
@@ -57,6 +61,7 @@ Use for: Inventory Counts.
 
 * **Strategy:** Short Duration \+ Fail-Safe.  
 * **Code Pattern:**  
+```csharp
   var stock \= await \_cache.GetOrSetAsync(  
       $"stock:{id}",  
       async (ctx) \=\> await \_repo.GetStockAsync(id),  
@@ -64,6 +69,7 @@ Use for: Inventory Counts.
           .SetDuration(TimeSpan.FromSeconds(5)) // Expire fast  
           .SetFailSafeMaxDuration(TimeSpan.FromMinutes(30)) // But survive outages  
   );
+```
 
 #### **Pattern C: "The Categorical Purge" (Tagging)**
 
